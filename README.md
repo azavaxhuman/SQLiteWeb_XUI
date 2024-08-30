@@ -6,6 +6,7 @@ This project is designed to be lightweight and easy to use SQLite-web and can be
 
 ## 🍀 Features
 
+- Compatible with X-UI (Alireza0 - 3XUI - X-UI)
 - Automatically install and configure sqlite-web
 - Generate Random Path to Access SQLite-web (or you can set your own path)
 - Create and manage SQLite databases
@@ -19,21 +20,21 @@ This project is designed to be lightweight and easy to use SQLite-web and can be
 <br>
 
 > [!IMPORTANT]
-> The Defualt Path of Databse is `/var/lib/marzban/db.sqlite3` and the Default Port is `8010`.
+> The Defualt Path of Databse is `/etc/x-ui/x-ui.db` and the Default Port is `8010`.
 
 ## 👀 How to Use?
 
 just copy/paste and enjoy :
 
 ```bash
-sudo bash -c "curl -sSL https://raw.githubusercontent.com/Marzban/SQLiteWeb_Marzban/main/install.sh | bash"
+sudo bash -c "curl -sSL https://raw.githubusercontent.com/azavaxhuman/SQLiteWeb_XUI/main/install.sh | bash"
 ```
 
 ## 📺 Video Tutorial
 
 You can find a video tutorial on how to use this repository here.
 
-- `YOUTUBE` You Can Find [The Video ( SQLiteWeb + Marzban ) Here](https://youtu.be/900-y56_y3w)
+- `YOUTUBE` You Can Find [The Video ( SQLiteWeb + X-UI ) Here](#)
 
 </details>
 
