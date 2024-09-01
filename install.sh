@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # DDS : DailyDigtalSKiills
-# YOUTUBE LINK: https://www.youtube.com/@DailyDigtalSKiills
+# YOUTUBE LINK: https://www.youtube.com/@DailyDigtalSKills
 #Telegram: @DailyDigtalSKiills
 
 # Colors for better readability
@@ -20,28 +20,15 @@ colors=(
     "\033[38;2;0;255;255m"    # Bright Cyan (#2BC4E2)
     "\033[0m"                 # Reset
 )
-
-foreground=${colors[0]}
-red=${colors[1]}
-green=${colors[2]}
-blue=${colors[3]}
-brightBlue=${colors[4]}
-brightWhite=${colors[5]}
-cyan=${colors[6]}
-brightYellow=${colors[7]}
-purple=${colors[8]}
-brightRed=${colors[9]}
-brightGreen=${colors[10]}
-brightCyan=${colors[11]}
-reset=${colors[12]}
+foreground=${colors[0]} red=${colors[1]} green=${colors[2]} blue=${colors[3]} brightBlue=${colors[4]} brightWhite=${colors[5]} cyan=${colors[6]} brightYellow=${colors[7]} purple=${colors[8]} brightRed=${colors[9]} brightGreen=${colors[10]} brightCyan=${colors[11]} reset=${colors[12]}
 
 # Helper functions
-print() { echo "${cyan}$1${reset}"; }
-error() { echo "${red}✗ $1${reset}"; }
-success() { echo "${green}✓ $1${reset}"; }
-log() { echo "${blue}! $1${reset}"; }
-input() { read -p "$(echo "${brightYellow}▶ $1${reset}")" "$2"; }
-confirm() { read -p "$(echo "\n${purple}Press any key to continue...${reset}")"; }
+print() { echo -e "${cyan}$1${reset}"; }
+error() { echo -e "${red}✗ $1${reset}"; }
+success() { echo -e "${green}✓ $1${reset}"; }
+log() { echo -e "${blue}! $1${reset}"; }
+input() { read -p "$(echo -e "${brightYellow}▶ $1${reset}")" "$2"; }
+confirm() { read -p "$(echo -e "\n${purple}Press any key to continue...${reset}")"; }
 
 check_success() {
     if [ $? -eq 0 ]; then
@@ -54,17 +41,21 @@ check_success() {
 
 # Function to display the main menu
 show_menu() {
-    print "SQLite Web Service Manager"
+    log "SQLite Web Service Manager"
+    print ""
     print "1) Install Service"
     print "2) Manage Service"
     print "3) Uninstall Service"
-    print "4) Exit"
+    print "0) Exit"
+    print ""
     input "Please choose an option: " choice
 }
 
 # Function to display the management submenu
 show_manage_menu() {
-    print "Manage SQLite-Web Service"
+    clear
+    log "Manage SQLite-Web Service"
+    print ""
     print "0) Show Full Log"
     print "1) Stop Service"
     print "2) Restart Service"
@@ -79,11 +70,12 @@ show_manage_menu() {
 
 # Function to install the service
 install_service() {
-    log "Updating and upgrading the system..."
-    sudo apt update && sudo apt upgrade -y > /dev/null 2>&1
+    log "Updating and upgrading the system...(Please wait)"
+    sudo apt update -y > /dev/null 2>&1  
+    sudo apt upgrade -y > /dev/null 2>&1
     check_success "System updated" "Failed to update system"
 
-    log "Installing required packages..."
+    log "Installing required packages...(Please wait)"
     sudo apt install -y sqlite3 python3 python3-pip > /dev/null 2>&1
     pip install sqlite-web > /dev/null 2>&1
     check_success "Required packages installed" "Failed to install required packages"
@@ -91,6 +83,11 @@ install_service() {
     DEFAULT_SQLITE_FILE="/etc/x-ui/x-ui.db"
     while true; do
         input "Please enter the path to the SQLite file (e.g., $DEFAULT_SQLITE_FILE): " SQLITE_FILE
+        if [$SQLITE_FILE == ""]; then
+            SQLITE_FILE=$DEFAULT_SQLITE_FILE
+            success "Using default SQLite file: $SQLITE_FILE"
+        fi
+
         if [ -f "$SQLITE_FILE" ]; then
             break
         else
@@ -104,6 +101,11 @@ install_service() {
     DEFAULT_PORT=8010;
     while true; do
         input "Please enter the port for the web interface (e.g., $DEFAULT_PORT): " PORT
+        if [$PORT == ""]; then
+            PORT=$DEFAULT_PORT
+            success "Using default port: $PORT"
+        fi
+
         if ! [[ $PORT =~ ^[0-9]+$ ]] || [ $PORT -lt 1 ] || [ $PORT -gt 65535 ]; then
             error "Invalid port number. Please try again."
         elif lsof -i :$PORT | grep -q LISTEN; then
@@ -112,9 +114,14 @@ install_service() {
             break
         fi
     done
-
-    input "Please enter the password for accessing the web interface:" PASSWORD
-
+    while true; do
+        input "Please enter the Password for accessing the web interface: " PASSWORD
+            if [ "$PASSWORD" == "" ]; then
+                error "Password cannot be empty. Please try again."
+                continue
+            fi
+    break
+    done
     input "Do you want to create a random URL path? (y/n): " random_path_choice
     if [ "$random_path_choice" == "y" ]; then
         URL_PATH=$(openssl rand -hex 12)
@@ -174,6 +181,8 @@ EOL
                 else
                     success "To access the service over HTTP, use the following URL: http://$(curl -4 -s ifconfig.me):$PORT/$URL_PATH"
                 fi
+                print ""
+                success " Your password is: $PASSWORD [Please don't forget it & keep it safe]"
         confirm "Press any key to continue..."
     else
         error "Failed to start the sqlite-web service."
@@ -185,21 +194,30 @@ EOL
 
 # Function to manage the service
 manage_service() {
+    if [ ! -f "/etc/systemd/system/sqlite-web.service" ]; then  
+        error "The sqlite-web service is not installed. Please install the service first."
+        confirm "Press any key to continue..."
+        break
+    else
     while true; do
         show_manage_menu
         case $manage_choice in
-            0) sudo journalctl -u sqlite-web --no-pager ;;
-            1) sudo systemctl stop sqlite-web; success "Service stopped." ;;
-            2) sudo systemctl restart sqlite-web; success "Service restarted." ;;
+            0) sudo journalctl -u sqlite-web --no-pager  ;;
+            1) sudo systemctl stop sqlite-web; success "Service stopped."     ;;
+            2) sudo systemctl restart sqlite-web; success "Service restarted."  ;;
             3) change_url_path ;;
             4) change_port ;;
             5) change_password ;;
             6) change_sqlite_path ;;
             7) change_ssl_cert ;;
-            8) break ;;
+            8) break;;
             *) error "Invalid option. Please try again." ;;
         esac
+        confirm "Press any key to continue..." 
     done
+
+    fi
+
 }
 
 # Function to change the service port
@@ -264,30 +282,43 @@ backup_sqlite_file() {
 
 # Function to uninstall the service
 uninstall_service() {
+    log "Uninstalling sqlite-web service..."
+    log "Stopping and disabling service..."
     sudo systemctl stop sqlite-web
+    check_success "Service stopped." "Failed to stop service."
+    log "disabling service..."
     sudo systemctl disable sqlite-web
+    check_success "Service disabled." "Failed to disable service."
+    log "removing service file..."
     sudo rm -f /etc/systemd/system/sqlite-web.service
+    check_success "Service file removed." "Failed to remove service file."
+    log "reloading systemd..."
     sudo systemctl daemon-reload
     check_success "sqlite-web service uninstalled." "Failed to uninstall sqlite-web service."
+    confirm "Press any key to continue..."
 }
 
+
+
+clear
 # Main script logic
 while true; do
-        log ""
-        success " Welcome to the SQLite3-Web + X-UI setup script."
-        log " "
-        log ""
-        log ""
-        log " _______________________________GITHUB :@azavaxhuman_______________________________"
-        log " "         
-        success "@DailyDigtalSKiills"
-        log " "
+        print ""
+        log "           Welcome to the SQLite3-Web + X-UI setup script."
+        print " ______________________________________________________________"
+        print " "         
+        success "           @DailyDigtalSKiills  |  GITHUB :@azavaxhuman"
+        print " "
     show_menu
     case $choice in
         1) install_service ;;
         2) manage_service ;;
         3) uninstall_service ;;
-        4) exit 0 ;;
-        *) error "Invalid option. Please try again." ;;
+        0) exit 0 ;;
+        *) error "Invalid option. Please try again." 
+        confirm "Press any key to continue..."
+        ;;
+        
     esac
+    clear
 done
