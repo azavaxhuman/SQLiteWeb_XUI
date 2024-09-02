@@ -27,7 +27,7 @@ This project is designed to be lightweight and easy to use SQLite-web and can be
 just copy/paste and enjoy :
 
 ```bash
-sudo bash -c "curl -sSL https://raw.githubusercontent.com/azavaxhuman/SQLiteWeb_XUI/main/install.sh | bash"
+sudo bash -c "$(curl -sL https://raw.githubusercontent.com/azavaxhuman/SQLiteWeb_XUI/main/install.sh)"
 ```
 
 ## 📺 Video Tutorial
