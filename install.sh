@@ -101,7 +101,7 @@ install_service() {
     DEFAULT_PORT=8010;
     while true; do
         input "Please enter the port for the web interface (e.g., $DEFAULT_PORT): " PORT
-        if [$PORT == ""]; then
+        if [ $PORT == "" ]; then
             PORT=$DEFAULT_PORT
             success "Using default port: $PORT"
         fi
