@@ -2,8 +2,6 @@
 
 <p align="center"><img style="border-radius: 5%" src="./shot.png" alt="project-image"></p>
 
-<details>
-
 This project is designed to be lightweight and easy to use SQLite-web and can be run on the same server where X-UI is installed. This repository is a fork of [SQLiteWeb](https://github.com/coleifer/sqlite-web) and modified to work with X-UI .SQLite-web is a web-based SQLite database browser written in Python using the Flask web framework. It provides a simple and intuitive interface for working with SQLite databases.
 
 ## 🍀 Features
